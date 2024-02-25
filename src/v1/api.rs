@@ -112,7 +112,9 @@ impl Client {
             path = path
         );
         let request = self.build_request(minreq::post(url), Self::is_beta(path));
-        let res = request.with_json(params).unwrap().send();
+        let res = request
+            .with_body(serde_json::to_string(params).unwrap())
+            .send();
         match res {
             Ok(res) => {
                 if (200..=299).contains(&res.status_code) {

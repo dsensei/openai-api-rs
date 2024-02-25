@@ -1,7 +1,7 @@
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Serialize, Serializer};
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use crate::impl_builder_methods;
 use crate::v1::common;
@@ -16,7 +16,7 @@ pub enum ToolChoiceType {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatCompletionRequest {
     pub model: String,
-    pub messages: Vec<ChatCompletionMessage>,
+    pub messages: Vec<ChatCompletionMessageForResponse>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,10 +46,15 @@ pub struct ChatCompletionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(serialize_with = "serialize_tool_choice")]
     pub tool_choice: Option<ToolChoiceType>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prettify_tools: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub strict_tools_decoding: Option<bool>,
 }
 
 impl ChatCompletionRequest {
-    pub fn new(model: String, messages: Vec<ChatCompletionMessage>) -> Self {
+    pub fn new(model: String, messages: Vec<ChatCompletionMessageForResponse>) -> Self {
         Self {
             model,
             messages,
@@ -67,6 +72,8 @@ impl ChatCompletionRequest {
             seed: None,
             tools: None,
             tool_choice: None,
+            prettify_tools: None,
+            strict_tools_decoding: None,
         }
     }
 }
@@ -147,7 +154,7 @@ pub struct ChatCompletionMessage {
     pub name: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ChatCompletionMessageForResponse {
     pub role: MessageRole,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -158,7 +165,7 @@ pub struct ChatCompletionMessageForResponse {
     pub tool_calls: Option<Vec<ToolCall>>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ChatCompletionChoice {
     pub index: i64,
     pub message: ChatCompletionMessageForResponse,
@@ -166,11 +173,9 @@ pub struct ChatCompletionChoice {
     pub finish_details: Option<FinishDetails>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ChatCompletionResponse {
     pub id: String,
-    pub object: String,
-    pub created: i64,
     pub model: String,
     pub choices: Vec<ChatCompletionChoice>,
     pub usage: common::Usage,
@@ -205,7 +210,7 @@ pub struct JSONSchemaDefine {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enum_values: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub properties: Option<HashMap<String, Box<JSONSchemaDefine>>>,
+    pub properties: Option<BTreeMap<String, Box<JSONSchemaDefine>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -217,12 +222,12 @@ pub struct FunctionParameters {
     #[serde(rename = "type")]
     pub schema_type: JSONSchemaType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub properties: Option<HashMap<String, Box<JSONSchemaDefine>>>,
+    pub properties: Option<BTreeMap<String, Box<JSONSchemaDefine>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<Vec<String>>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
 #[allow(non_camel_case_types)]
 pub enum FinishReason {
     stop,
@@ -232,7 +237,7 @@ pub enum FinishReason {
     null,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[allow(non_camel_case_types)]
 pub struct FinishDetails {
     pub r#type: FinishReason,
