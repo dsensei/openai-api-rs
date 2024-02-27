@@ -10,6 +10,7 @@ use crate::v1::common;
 pub enum ToolChoiceType {
     None,
     Auto,
+    Any,
     ToolChoice { tool: Tool },
 }
 
@@ -269,6 +270,7 @@ where
     match value {
         Some(ToolChoiceType::None) => serializer.serialize_str("none"),
         Some(ToolChoiceType::Auto) => serializer.serialize_str("auto"),
+        Some(ToolChoiceType::Any) => serializer.serialize_str("any"),
         Some(ToolChoiceType::ToolChoice { tool }) => {
             let mut map = serializer.serialize_map(Some(2))?;
             map.serialize_entry("type", &tool.r#type)?;
