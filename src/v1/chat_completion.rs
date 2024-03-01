@@ -50,8 +50,11 @@ pub struct ChatCompletionRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prettify_tools: Option<bool>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub strict_tools_decoding: Option<bool>,
+    pub structure_output_decoding_mode: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub use_raw_output: Option<bool>,
 }
 
 impl ChatCompletionRequest {
@@ -74,7 +77,8 @@ impl ChatCompletionRequest {
             tools: None,
             tool_choice: None,
             prettify_tools: None,
-            strict_tools_decoding: None,
+            structure_output_decoding_mode: None,
+            use_raw_output: None,
         }
     }
 }
