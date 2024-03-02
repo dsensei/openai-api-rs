@@ -17,7 +17,7 @@ pub enum ToolChoiceType {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatCompletionRequest {
     pub model: String,
-    pub messages: Vec<ChatCompletionMessageForResponse>,
+    pub messages: Vec<ChatCompletionMessage>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,7 +58,7 @@ pub struct ChatCompletionRequest {
 }
 
 impl ChatCompletionRequest {
-    pub fn new(model: String, messages: Vec<ChatCompletionMessageForResponse>) -> Self {
+    pub fn new(model: String, messages: Vec<ChatCompletionMessage>) -> Self {
         Self {
             model,
             messages,
@@ -108,6 +108,7 @@ pub enum MessageRole {
     system,
     assistant,
     function,
+    tool,
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
@@ -154,9 +155,11 @@ pub struct ImageUrl {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ChatCompletionMessage {
     pub role: MessageRole,
-    pub content: Content,
+    pub content: Option<Content>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    pub tool_calls: Option<Vec<ToolCall>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tool_call_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -167,7 +170,7 @@ pub struct ChatCompletionMessageForResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub tool_calls: Option<Vec<ToolCall>>,
+    pub function_call: Option<ToolCallFunction>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
