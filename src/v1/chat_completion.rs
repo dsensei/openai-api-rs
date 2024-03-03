@@ -171,6 +171,8 @@ pub struct ChatCompletionMessageForResponse {
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function_call: Option<ToolCallFunction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tool_calls: Option<Vec<ToolCall>>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
