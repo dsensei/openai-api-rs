@@ -55,6 +55,8 @@ pub struct ChatCompletionRequest {
     pub structure_output_decoding_mode: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub use_raw_output: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_thinking: Option<bool>,
 }
 
 impl ChatCompletionRequest {
@@ -79,6 +81,7 @@ impl ChatCompletionRequest {
             prettify_tools: None,
             structure_output_decoding_mode: None,
             use_raw_output: None,
+            include_thinking: None,
         }
     }
 }
