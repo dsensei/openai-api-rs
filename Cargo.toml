@@ -9,6 +9,9 @@ repository = "https://github.com/dongri/openai-api-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[dependencies]
+pyo3 = { version = "0.20.0", features = ["auto-initialize"] }
+
 [dependencies.serde]
 version = "1"
 features = ["derive"]
@@ -22,3 +25,4 @@ default-features = false
 version = "2"
 default-features = false
 features = ["https-rustls", "json-using-serde", "proxy"]
+

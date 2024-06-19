@@ -18,6 +18,7 @@ pub enum ToolChoiceType {
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct EmpowerMetadata {
+    pub id: Option<String>,
     pub lora_request: Option<LoraRequest>,
     
     pub tools_only: Option<bool>,

@@ -1,5 +1,8 @@
+use pyo3::{types::PyModule, FromPyObject, IntoPy, PyObject, Python};
+use serde::{Deserialize, Serialize};
 
-#[derive(FromPyObject, Debug, Serialize, Deserialize)]
+
+#[derive(FromPyObject, Debug, Serialize, Deserialize, Clone)]
 pub struct LoraRequest {
     lora_id: String,
     lora_int_id: i32,
