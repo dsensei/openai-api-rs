@@ -144,7 +144,7 @@ pub enum MessageRole {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum StructuredContent {
     Text { text: String },
-    ImageUrl { image_url: ImageUrl },
+    ImageUrl { image_url: ImageUrlType },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
