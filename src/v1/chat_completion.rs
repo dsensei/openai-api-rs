@@ -1,7 +1,9 @@
-use serde::ser::SerializeMap;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::de::{self, SeqAccess, Visitor};
+use serde::ser::{SerializeMap, SerializeSeq};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
+use std::fmt;
 
 use crate::impl_builder_methods;
 use crate::v1::common;
@@ -114,20 +116,72 @@ pub enum MessageRole {
     tool,
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
-pub enum Content {
-    Text(String),
-    ImageUrl(Vec<ImageUrl>),
+#[derive(Debug, Deserialize, PartialEq, Eq, Serialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum StructuredContent {
+    Text { text: String },
+    ImageUrl { image_url: ImageUrl },
 }
 
-impl serde::Serialize for Content {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Content {
+    PlainText(String),
+    Structured(Vec<StructuredContent>),
+}
+
+impl<'de> Deserialize<'de> for Content {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct ContentVisitor;
+
+        impl<'de> Visitor<'de> for ContentVisitor {
+            type Value = Content;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("a string or an array of structured content")
+            }
+
+            fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where
+                E: de::Error,
+            {
+                Ok(Content::PlainText(value.to_string()))
+            }
+
+            fn visit_seq<V>(self, mut seq: V) -> Result<Self::Value, V::Error>
+            where
+                V: SeqAccess<'de>,
+            {
+                let mut contents = Vec::new();
+
+                while let Some(value) = seq.next_element::<StructuredContent>()? {
+                    contents.push(value);
+                }
+
+                Ok(Content::Structured(contents))
+            }
+        }
+
+        deserializer.deserialize_any(ContentVisitor)
+    }
+}
+
+impl Serialize for Content {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer,
+        S: Serializer,
     {
         match *self {
-            Content::Text(ref text) => serializer.serialize_str(text),
-            Content::ImageUrl(ref image_url) => image_url.serialize(serializer),
+            Content::PlainText(ref s) => serializer.serialize_str(s),
+            Content::Structured(ref vec) => {
+                let mut seq = serializer.serialize_seq(Some(vec.len()))?;
+                for element in vec {
+                    seq.serialize_element(element)?;
+                }
+                seq.end()
+            }
         }
     }
 }
