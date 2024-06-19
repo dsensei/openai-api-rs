@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(FromPyObject, Debug, Serialize, Deserialize, Clone)]
 pub struct LoraRequest {
-    lora_id: String,
-    lora_int_id: i32,
-    lora_local_path: String,
+    pub lora_id: String,
+    pub lora_int_id: i32,
+    pub lora_local_path: String,
 }
 
 impl IntoPy<PyObject> for LoraRequest {
