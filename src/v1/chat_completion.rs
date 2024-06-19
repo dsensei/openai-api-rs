@@ -6,7 +6,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::fmt;
 
 use crate::impl_builder_methods;
-use crate::v1::common;
+use crate::v1::{common, pyo3::LoraRequest};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum ToolChoiceType {
@@ -14,6 +14,21 @@ pub enum ToolChoiceType {
     Auto,
     Any,
     ToolChoice { tool: Tool },
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct EmpowerMetadata {
+    pub lora_request: Option<LoraRequest>,
+    
+    pub tools_only: Option<bool>,
+    pub tools_enabled: Option<bool>,
+
+    pub conversation_json_schema: Option<String>,
+    pub tools_json_schema: Option<String>,
+    pub num_cached_prefix_messages: Option<usize>,
+    
+    // Debug flags
+    pub logprobs: Option<usize>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -59,6 +74,8 @@ pub struct ChatCompletionRequest {
     pub use_raw_output: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_thinking: Option<bool>,
+    
+    pub empower_metadata: Option<EmpowerMetadata>,
 }
 
 impl ChatCompletionRequest {
@@ -84,6 +101,7 @@ impl ChatCompletionRequest {
             structure_output_decoding_mode: None,
             use_raw_output: None,
             include_thinking: None,
+            empower_metadata: None,
         }
     }
 }
