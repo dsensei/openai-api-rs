@@ -21,6 +21,9 @@ pub struct EmpowerMetadata {
     pub id: Option<String>,
     pub lora_request: Option<LoraRequest>,
     
+    pub use_beam_search: Option<bool>,
+    pub best_of: Option<i32>,
+    
     pub tools_only: Option<bool>,
     pub tools_enabled: Option<bool>,
 
@@ -30,6 +33,7 @@ pub struct EmpowerMetadata {
     
     // Debug flags
     pub logprobs: Option<usize>,
+    pub ignore_eos: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
