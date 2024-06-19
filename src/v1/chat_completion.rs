@@ -20,17 +20,17 @@ pub enum ToolChoiceType {
 pub struct EmpowerMetadata {
     pub id: String,
     pub lora_request: Option<LoraRequest>,
-    
+
     pub use_beam_search: Option<bool>,
     pub best_of: Option<i32>,
-    
+
     pub tools_only: Option<bool>,
     pub tools_enabled: Option<bool>,
 
     pub conversation_json_schema: Option<String>,
     pub tools_json_schema: Option<String>,
     pub num_cached_prefix_messages: Option<usize>,
-    
+
     // Debug flags
     pub logprobs: Option<usize>,
     pub ignore_eos: bool,
@@ -79,7 +79,8 @@ pub struct ChatCompletionRequest {
     pub use_raw_output: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_thinking: Option<bool>,
-    
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub empower_metadata: Option<EmpowerMetadata>,
 }
 
