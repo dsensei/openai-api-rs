@@ -34,6 +34,7 @@ pub struct EmpowerMetadata {
     // Debug flags
     pub logprobs: Option<usize>,
     pub ignore_eos: bool,
+    pub skip_chat_template: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
